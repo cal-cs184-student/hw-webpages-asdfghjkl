@@ -55,6 +55,22 @@
 		Our triangle rasterization algorithm works as follows:
 		1. We compute the bounding box by calculating the min and max x & y coordinates of the triangle's 3 vertices. This defines a rectangular space that can fully contain the triangle
 		2. We iterate through each pixel (x, y) within this bounding box to test whether it lies inside the triangle
+		3. For each pixel, We test the point at (x+0.5, y+0.5) which is the center of the pixel rather than the corner
+		4. We used the get_orientation helper function to compute the signed area (cross product) for each edge. This gives me 3 baycentric-like values (w0, w1, w2) that determine which side of each edge the sample point lies on. 
+		5. A point is inside the traingle if all 3 orientation values have the same sign as the total triangle area. So we have to check both cases: all positive (counter-clockwise) or all negative (clockwise). Points on the boundary (any w value = 0) is treated as inside the boundary.
+		6. If the point passes the test for inside, we call rasterise_point(x, y, color) which calls fill_pixel() to color the pixel.
+
+		Bounding Box Efficiency:
+		Our algorithm is no worse than checking each sample within the bounding box because we are doing just that.
+		Our outer loops iterate from minX to maxX and minY to maxY, which are computed directly from the triangle vertices using floor() and ceil()
+		This means we only check the pixels within the smallest axis-aligned rectangle containing the triangle, and we don't perform checks outside this bounding box, making the algorithm exactly as efficient as a bounding-box approach.
+		The time complexity is O(width x height of bounding box), which is optimal for this rasterization method.
+
+		<figure>
+			<img src="task1.png" alt="task1" style="width:50%"/>
+			<figcaption>Task 1: basic/test4.svg</figcaption>
+		</figure>
+
 
 		<p>Here is an example 2x2 gridlike structure using an HTML table. Each <b>tr</b> is a row and each <b>td</b> is a column in that row. You might find this useful for framing and showing your result images in an organized fashion.</p>
 		<div style="display: flex; flex-direction: column; align-items: center;">
