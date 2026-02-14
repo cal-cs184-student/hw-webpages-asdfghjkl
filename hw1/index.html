@@ -32,11 +32,11 @@
 
 		<br>
 
-		Link to webpage: <a href="https://cal-cs184-student.github.io/hw-webpages-asdfghjkl/">cs184.eecs.berkeley.edu/sp25</a>
+		Link to webpage: <a href="https://cal-cs184-student.github.io/hw-webpages-asdfghjkl/">cal-cs184-student.github.io/hw-webpages-asdfghjkl</a>
 		
 		<br>
 
-		Link to GitHub repository: <a href="https://github.com/cal-cs184-student/hw1-rasterizer-asdfghjkl">cs184.eecs.berkeley.edu/sp25</a>
+		Link to GitHub repository: <a href="https://github.com/cal-cs184-student/hw1-rasterizer-asdfghjkl">cal-cs184-student/hw1-rasterizer-asdfghjkl</a>
 
 		<figure>
 			<img src="lion.jpg" alt="Lion" style="width:50%"/>
@@ -51,20 +51,20 @@
 		Give a high-level overview of what you implemented in this homework. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the homework.
 
 		<h2>Task 1: Drawing Single-Color Triangles</h2>
-		How I Rasterise Triangles:
-		Our triangle rasterization algorithm works as follows:
-		1. We compute the bounding box by calculating the min and max x & y coordinates of the triangle's 3 vertices. This defines a rectangular space that can fully contain the triangle
-		2. We iterate through each pixel (x, y) within this bounding box to test whether it lies inside the triangle
-		3. For each pixel, We test the point at (x+0.5, y+0.5) which is the center of the pixel rather than the corner
-		4. We used the get_orientation helper function to compute the signed area (cross product) for each edge. This gives me 3 baycentric-like values (w0, w1, w2) that determine which side of each edge the sample point lies on. 
-		5. A point is inside the traingle if all 3 orientation values have the same sign as the total triangle area. So we have to check both cases: all positive (counter-clockwise) or all negative (clockwise). Points on the boundary (any w value = 0) is treated as inside the boundary.
-		6. If the point passes the test for inside, we call rasterise_point(x, y, color) which calls fill_pixel() to color the pixel.
+		<p><strong>How I Rasterise Triangles:</strong></p>
+		<p>Our triangle rasterization algorithm works as follows:</p>
+		<ol>
+			<li>We compute the bounding box by calculating the min and max x & y coordinates of the triangle's 3 vertices. This defines a rectangular space that can fully contain the triangle</li>
+			<li>We iterate through each pixel (x, y) within this bounding box to test whether it lies inside the triangle</li>
+			<li>For each pixel, We test the point at (x+0.5, y+0.5) which is the center of the pixel rather than the corner</li>
+			<li>We used the get_orientation helper function to compute the signed area (cross product) for each edge. This gives me 3 baycentric-like values (w0, w1, w2) that determine which side of each edge the sample point lies on.</li>
+			<li>A point is inside the traingle if all 3 orientation values have the same sign as the total triangle area. So we have to check both cases: all positive (counter-clockwise) or all negative (clockwise). Points on the boundary (any w value = 0) is treated as inside the boundary.</li>
+			<li>If the point passes the test for inside, we call rasterise_point(x, y, color) which calls fill_pixel() to color the pixel.</li>
+		</ol>
 
-		Bounding Box Efficiency:
-		Our algorithm is no worse than checking each sample within the bounding box because we are doing just that.
-		Our outer loops iterate from minX to maxX and minY to maxY, which are computed directly from the triangle vertices using floor() and ceil()
-		This means we only check the pixels within the smallest axis-aligned rectangle containing the triangle, and we don't perform checks outside this bounding box, making the algorithm exactly as efficient as a bounding-box approach.
-		The time complexity is O(width x height of bounding box), which is optimal for this rasterization method.
+		<p><strong>Bounding Box Efficiency:</strong></p>
+		<p>Our algorithm is no worse than checking each sample within the bounding box because we are doing just that. Our outer loops iterate from minX to maxX and minY to maxY, which are computed directly from the triangle vertices using floor() and ceil(). This means we only check the pixels within the smallest axis-aligned rectangle containing the triangle, and we don't perform checks outside this bounding box, making the algorithm exactly as efficient as a bounding-box approach. The time complexity is O(width x height of bounding box), which is optimal for this rasterization method.</p>
+
 
 		<figure>
 			<img src="task1.png" alt="task1" style="width:50%"/>
