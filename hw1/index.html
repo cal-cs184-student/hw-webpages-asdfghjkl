@@ -113,7 +113,7 @@
 			<li>Then, in resolve_to_framebuffer, we downsample by averaging all supersamples corresponding to each output pixel and writing the result to the frame buffer.</li>
 		</ol>
 
-		<p>As we can see below, as sampling rate goes up, the aliasing artefacts goes down, and the disconnected edge becomes smoother.</p>
+		<p>As we can see below, as sampling rate goes up, the aliasing artefacts goes down, and the disconnected pixels on the sharp edge becomes connected and smoother.</p>
 
 		<div style="display: flex; flex-direction: column; align-items: center;">
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
@@ -142,7 +142,21 @@
 
 
 		<h2>Task 3: Transforms</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		<p><strong>How Did We Implement Transform:</strong></p>
+		<p><strong>translate(dx, dy):</strong> this is a translation matrix with 1's on the diagonal and dx, dy in the third column, hence shifting points by (dx, dy)</p>
+		<p><strong>scale(sx, sy):</strong> this is a scaling matrix that multiplies x-coordinates by sx and y-coordinates by sy, with sx, sy and 1 on the diagonal.</p>
+		<p><strong>roatate(deg):</strong> this is a rotation matrix that rotates points counterclockwise by deg degrees, with cos(θ) and -sin(θ) in the first row and sin(θ) and cos(θ) in the second row.</p>
+
+
+		<p><strong>What Did We Do to Cubeman:</strong></p>
+		<p>We modified cubeman to be happier! It is now a blue cubeman dancing! </p>
+
+		<figure>
+			<img src="task3.png" alt="task3" style="width:50%"/>
+			<figcaption>Task 3: Dancing Blue Cubeman</figcaption>
+		</figure>
+
+
 
 		<h2>Task 4: Barycentric coordinates</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
