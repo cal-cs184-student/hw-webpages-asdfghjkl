@@ -51,15 +51,15 @@
 		Give a high-level overview of what you implemented in this homework. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the homework.
 
 		<h2>Task 1: Drawing Single-Color Triangles</h2>
-		<p><strong>How I Rasterise Triangles:</strong></p>
+		<p><strong>How We Rasterise Triangles:</strong></p>
 		<p>Our triangle rasterization algorithm works as follows:</p>
 		<ol>
 			<li>We compute the bounding box by calculating the min and max x & y coordinates of the triangle's 3 vertices. This defines a rectangular space that can fully contain the triangle</li>
 			<li>We iterate through each pixel (x, y) within this bounding box to test whether it lies inside the triangle</li>
 			<li>For each pixel, We test the point at (x+0.5, y+0.5) which is the center of the pixel rather than the corner</li>
-			<li>We used the get_orientation helper function to compute the signed area (cross product) for each edge. This gives me 3 baycentric-like values (w0, w1, w2) that determine which side of each edge the sample point lies on.</li>
+			<li>We used the get_orientation helper function to compute the signed area (cross product) for each edge. This gives us 3 orientation values (w0, w1, w2) that determine which side of each edge the sample point lies on.</li>
 			<li>A point is inside the traingle if all 3 orientation values have the same sign as the total triangle area. So we have to check both cases: all positive (counter-clockwise) or all negative (clockwise). Points on the boundary (any w value = 0) is treated as inside the boundary.</li>
-			<li>If the point passes the test for inside, we call rasterise_point(x, y, color) which calls fill_pixel() to color the pixel.</li>
+			<li>If the point passes the test for inside, we color the pixel.</li>
 		</ol>
 
 		<p><strong>Bounding Box Efficiency:</strong></p>
@@ -68,10 +68,10 @@
 
 		<figure>
 			<img src="task1.png" alt="task1" style="width:50%"/>
-			<figcaption>Task 1: basic/test4.svg</figcaption>
+			<figcaption>Task 1: Rasterised triangles with disconnected pixels (aliasing)</figcaption>
 		</figure>
 
-
+<!-- 
 		<p>Here is an example 2x2 gridlike structure using an HTML table. Each <b>tr</b> is a row and each <b>td</b> is a column in that row. You might find this useful for framing and showing your result images in an organized fashion.</p>
 		<div style="display: flex; flex-direction: column; align-items: center;">
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
@@ -96,10 +96,66 @@
 				</td>
 			  </tr>
 			</table>
-		</div>
+		</div> -->
 		
 		<h2>Task 2: Antialiasing by Supersampling</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+		<p><strong>Why is Supersampling Useful:</strong></p>
+		<p>It is useful because it reduces aliasing such as jagged edges on the triangle boundaries. By sampling multiple times per pixel and averaging the results, we get smoother edges that can better approximate the true geometry.</p>
+
+		<p><strong>How We Implemented Supersampling:</strong></p>
+		<p>Our supersampling algorithm works as follows:</p>
+		<ol>
+			<li>We treat the sample buffer as a higher resolution version of the framebuffer.</li>
+			<li>For a sample rate of N, the sample buffer is N times larger than the framebuffer. </li>
+			<li>In rasterize_triangle, we scale up the triangle coordinates by sqrt(sample_rate) and rasterize into this higher resolution sample buffer, sampling at the center of each supersample.</li>
+			<li>In fill_pixel, instead of writing to a single location, we fill all sqrt(sample_rate) x sqrt(sample_rate) supersamples corresponding to that pixel with the same colour, ensuring points and lines still render correctly without supersampling.</li>
+			<li>Then, in resolve_to_framebuffer, we downsample by averaging all supersamples corresponding to each output pixel and writing the result to the frame buffer.</li>
+		</ol>
+
+		<p>As we can see below, as sampling rate goes up, the aliasing artefacts goes down, and the disconnected edge becomes smoother.</p>
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="task2-1.png" width="400px"/>
+				  <figcaption>Task2: Sample rate 1</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="task2-2.png" width="400px"/>
+				  <figcaption>Task2: Sample rate 2</figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="task2-3.png" width="400px"/>
+				  <figcaption>Task2: Sample rate 3</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="task2-4.png" width="400px"/>
+				  <figcaption>Task2: Sample rate 4</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div> 
+
+
+		Our supersampling algorithm works as follows. 
+		We treat the sample_buffer as a higher resolution version of the framebuffer. 
+		For a sample rate of N, the sample buffer is N times larger than the framebuffer, with dimensions (width × sqrt(N)) × (height × sqrt(N)). 
+		In rasterize_triangle, we scale up the triangle coordinates by sqrt(sample_rate) and rasterize into this higher resolution sample buffer, sampling at the center of each supersample. 
+		In fill_pixel, instead of writing to a single location, we fill all sqrt(sample_rate) × sqrt(sample_rate) supersamples corresponding to that pixel with the same color, ensuring points and lines still render correctly without supersampling. 
+		Finally, in resolve_to_framebuffer, we downsample by averaging all supersamples corresponding to each output pixel and writing the result to the framebuffer.
+The modifications we made to the rasterization pipeline were: set_sample_rate() and set_framebuffer_target() now resize the sample_buffer to width × height × sample_rate to accommodate the extra samples. 
+rasterize_triangle() now scales coordinates by sqrt(sample_rate) and writes directly into the higher resolution sample buffer. 
+fill_pixel() now fills all supersamples of a pixel with the same color to keep points and lines rendering correctly. 
+resolve_to_framebuffer() now averages the supersamples for each pixel before writing to the framebuffer.
+Screenshots at Different Sample Rates
+At sample rate 1, the skinny triangle corners appear very jagged and disconnected, as a single sample per pixel either fully includes or excludes it. 
+At sample rate 4, the edges become noticeably smoother as we average 4 samples per pixel, capturing partial coverage along edges. 
+At sample rate 16, the edges are even smoother still, as we now have 16 samples per pixel giving a much more accurate estimate of how much of each pixel is covered by the triangle.
+
 
 		<h2>Task 3: Transforms</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
