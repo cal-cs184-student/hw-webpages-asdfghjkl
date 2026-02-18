@@ -173,15 +173,33 @@
 			<li>α₂ = Area(V0, V1, P) / Area(V0, V1, V2)</li>
 		</ul>
 
-		<p>This is very useful for interpolation. If each vertex has a colour, we can smoothly blend the colour values across the triangle by using the barycentric weights:</p>
+		<p>This is very useful for interpolation. If each vertex has a color, we can smoothly blend the color values across the triangle by using the barycentric weights:</p>
 
 		<p>Color(P) = α₀·Color(V0) + α₁·Color(V1) + α₂·Color(V2)</p>
 
-		<p>In our implementation, we reused the triangle rasterization code from Task 2, but instead of filling each pixel with a single color, we calculated the barycentric coordinates (α₀, α₁, α₂) for each sample point and use them to interpolate between the three vertex colors. This creates smooth color gradients across the triangle.</p>
-		<figure>
-			<img src="task4.png" alt="task3" style="width:50%"/>
+		<p>In our implementation, we reused the triangle rasterization code from Task 2, but instead of filling each pixel with a single color, we calculated the barycentric coordinates (α₀, α₁, α₂) for each sample point and use them to interpolate between the three vertex colors.</p>
+		<!-- <figure>
+			<img src="task4-1.png" alt="task4" style="width:50%"/>
 			<figcaption>Task 4: Baycentric Triangle</figcaption>
 		</figure>
+
+		<figure>
+			<img src="task4-2.png" alt="task4" style="width:50%"/>
+			<figcaption>Task 4: Colorwheel</figcaption>
+		</figure> -->
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="task2-1.png" width="400px"/>
+				  <figcaption>Task2: Sample rate 1</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="task2-2.png" width="400px"/>
+				  <figcaption>Task2: Sample rate 2</figcaption>
+				</td>
+			  </tr>
 
 
 		<h2>Task 5: "Pixel sampling" for texture mapping</h2>
