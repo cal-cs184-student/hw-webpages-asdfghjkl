@@ -141,22 +141,6 @@
 		</div> 
 
 
-		Our supersampling algorithm works as follows. 
-		We treat the sample_buffer as a higher resolution version of the framebuffer. 
-		For a sample rate of N, the sample buffer is N times larger than the framebuffer, with dimensions (width × sqrt(N)) × (height × sqrt(N)). 
-		In rasterize_triangle, we scale up the triangle coordinates by sqrt(sample_rate) and rasterize into this higher resolution sample buffer, sampling at the center of each supersample. 
-		In fill_pixel, instead of writing to a single location, we fill all sqrt(sample_rate) × sqrt(sample_rate) supersamples corresponding to that pixel with the same color, ensuring points and lines still render correctly without supersampling. 
-		Finally, in resolve_to_framebuffer, we downsample by averaging all supersamples corresponding to each output pixel and writing the result to the framebuffer.
-The modifications we made to the rasterization pipeline were: set_sample_rate() and set_framebuffer_target() now resize the sample_buffer to width × height × sample_rate to accommodate the extra samples. 
-rasterize_triangle() now scales coordinates by sqrt(sample_rate) and writes directly into the higher resolution sample buffer. 
-fill_pixel() now fills all supersamples of a pixel with the same color to keep points and lines rendering correctly. 
-resolve_to_framebuffer() now averages the supersamples for each pixel before writing to the framebuffer.
-Screenshots at Different Sample Rates
-At sample rate 1, the skinny triangle corners appear very jagged and disconnected, as a single sample per pixel either fully includes or excludes it. 
-At sample rate 4, the edges become noticeably smoother as we average 4 samples per pixel, capturing partial coverage along edges. 
-At sample rate 16, the edges are even smoother still, as we now have 16 samples per pixel giving a much more accurate estimate of how much of each pixel is covered by the triangle.
-
-
 		<h2>Task 3: Transforms</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
