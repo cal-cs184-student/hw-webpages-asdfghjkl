@@ -57,8 +57,8 @@
 			<li>We compute the bounding box by calculating the min and max x & y coordinates of the triangle's 3 vertices. This defines a rectangular space that can fully contain the triangle</li>
 			<li>We iterate through each pixel (x, y) within this bounding box to test whether it lies inside the triangle</li>
 			<li>For each pixel, We test the point at (x+0.5, y+0.5) which is the center of the pixel rather than the corner</li>
-			<li>We used the get_orientation helper function to compute the signed area (cross product) for each edge. This gives us 3 orientation values (w0, w1, w2) that determine which side of each edge the sample point lies on.</li>
-			<li>A point is inside the traingle if all 3 orientation values have the same sign as the total triangle area. So we have to check both cases: all positive (counter-clockwise) or all negative (clockwise). Points on the boundary (any w value = 0) is treated as inside the boundary.</li>
+			<li>We used the get_orientation helper function to compute the cross product of the point with respect to each edge. This gives us 3 orientation values (w0, w1, w2) that determine which side of each edge the sample point lies on.</li>
+			<li>A point is inside the traingle if all 3 orientation values have the same sign as the cross product of the 3 vertices. So we have to check both cases: all positive (counter-clockwise) or all negative (clockwise). Points on the boundary (any w value = 0) is treated as inside the boundary.</li>
 			<li>If the point passes the test for inside, we color the pixel.</li>
 		</ol>
 
@@ -268,8 +268,78 @@
 			</table>
 		</div> 		
 
+		<p>As we can see from the images, bilinear sampling method produces smoother textures as compared to the nearest neighbour method, especially at sample rate 1. </p>
+
+		<p><strong>Relative Differences:</strong></p>
+		<p><strong>The difference is most noticeable when: </strong></p>
+		<ul>
+			<li><strong>Magnified texture: </strong> When fewer texels cover more screen pixels, nearest sampling creates visible pixel blocks while bilinear sampling smooths out gradients between texels values.</li>
+			<li><strong>High-frequency details: </strong>Nearest neighbours causes visible aliasing and pixelation when the texture contains fine details or sharp edges, while bilinear sampling smooths these transitions out.</li>
+			<li><strong>At low sample rates: </strong>With only 1 sample per pixel, there is no supersampling to mask the aliasing artefact from nearest neighbour, hence bilinear sampling outperforms.</li>
+			<li><strong>Textures are viewed at angles: </strong>When UV coordinates don't align with the texel grid, bilinear sampling provides much better results through interpolating than nearest neighbour which snaps to discrete positions.</li>
+		</ul>
+
+		<p>The fundamental difference is that nearest neighbor creates discontinuities by jumping from one texel color to another, while bilinear sampling maintains continuity by smoothly blending between neighboring texel values.</p>
+
 		<h2>Task 6: "Level Sampling" with mipmaps for texture mapping</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		<p><strong>What is Level Sampling: </strong></p>
+		<p>Level sampling (mipmapping) is a techniqu to select the appropriate resolution of a texture based on how much screen space it occupies. Mipmap is a precomputed sequence of textures, each half the resolution of the previous one. When a texture covers fewer pixels on screen, we use a lower level mipmap to avoid aliasing artefacts that occur when many texels map to 1 pixel.</p>
+
+		<p><strong>How Did We Implement Level Sampling:</strong></p>
+		<p>We first calculated the mipmap level needed for each pixel in get_level(). This function computes how much the UV coordinates change between adjacent pixels by taking the difference between sp.p_dx_uv - sp.p_uv and sp.p_dy_uv - sp.p_uv. We scale these differences by the texture width and height, then compute the length of each gradient vector. The mipmap level is deteremined by taking log2 of the maximum gradient length, which tells us how many texels correspond to 1 pixel.</p>
+		<p>In our sample() function, we implemented three level sampling methods:</p>
+		<ul>
+			<li><strong>L_ZERO:</strong> Always sample from level 0 (full resolution), which is done in Task 5</li>
+			<li><strong>L_NEAREST:</strong> Calculate the mipmap level and round to the nearest integer, then sample from that discrete level</li>
+			<li><strong>L_LINEAR:</strong> Calculate the continuous mipmap level, then sample from both adjacent integer levels and linearly interpolate between them based on the fractional part</li>
+		</ul>
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="lzpn.png" width="400px"/>
+				  <figcaption>Task6: L_ZERO and P_NEAREST</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="lzpl.png" width="400px"/>
+				  <figcaption>Task6: L_ZERO and P_LINEAR</figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="lnpn.png" width="400px"/>
+				  <figcaption>Task6: L_NEAREST and P_NEAREST</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="lnpl.png" width="400px"/>
+				  <figcaption>Task6: L_NEAREST and P_LINEAR</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div> 
+
+		<p><strong>Tradeoffs:</strong></p>
+		<p><strong>Pixel Sampling (P_NEAREST vs P_LINEAR):</strong></p>
+		<ul>
+			<li><strong>Speed:</strong> Nearest is faster (1 texture lookup) vs bilinear (4 texture lookups)</li>
+			<li><strong>Memory:</strong> Both use the same memory</li>
+			<li><strong>Antialiasing:</strong> Bilinear provides better antialiasing for texture magnification by smoothing between texels</li>
+		</ul>
+
+		<p><strong>Level Sampling (L_ZERO vs L_NEAREST vs L_LINEAR):</strong></p>
+		<ul>
+			<li><strong>Speed:</strong> L_ZERO is fastest (no level calculation), L_NEAREST adds level computation, L_LINEAR is slowest (samples two levels and interpolates)</li>
+			<li><strong>Memory:</strong> L_ZERO uses only full resolution, while L_NEAREST and L_LINEAR require storing the entire mipmap pyramid (adds ~33% memory to store all mipmap levels)</li>
+			<li><strong>Antialiasing:</strong> L_ZERO suffers from aliasing when textures are minified, L_NEAREST improves this significantly, L_LINEAR (trilinear when combined with P_LINEAR) provides the smoothest results by removing level transition artifacts</li>
+		</ul>
+
+		<p><strong>Supersampling (1 vs 16 samples per pixel):</strong></p>
+		<ul>
+			<li><strong>Speed:</strong> Slow. 16x supersampling is 16 times slower than 1 sample per pixel (O(N) time, where N is sample rate)</li>
+			<li><strong>Memory:</strong> Requires N times more memory for sample buffer</li>
+			<li><strong>Antialiasing:</strong> Effective at reducing geometric edge aliasing and provides some texture antialiasing, but less efficient than mipmapping for texture minification</li>
+		</ul>
 
 		<h2>(Optional) Task 7: Extra Credit - Draw Something Creative!</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
