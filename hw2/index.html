@@ -147,10 +147,27 @@
 
 
 		<h3>Part 2: Bezier surfaces with separable 1D de Casteljau</h3>
-		
+		<p><strong>How does de Casteljau's Algorithm extends to Bezier Surface:</strong></p>
 
+		<p>
+			The de Casteljau alogrithm extends to Bezier surfaces by applying the same 1D interpolation algorithm across 2 dimensions. 
+			A Bezier patch is an <em>n x n</em> grid of control points and 2 parameters, <em>u</em> and <em>v</em>. 
+			To evaluate a point on the surface, we first treat each row of <em>n</em> control points as independent Bezier curves and evaluate it at parameter <em>u</em>. 
+			This will reduce the grid to a single column of <em>n</em> new points. This resulting column is then treated as a final Bezier curve and evaluated at parameter <em>v</em>. 
+			The final point produced will lie on the Bezier surface at <em>(u, v)</em>. 
+		</p>
 
-		
+		<p><strong>How We Implemented de Casteljau's Algorithm for Bezier Surface:</strong></p>
+
+		<p>
+
+		</p>
+
+		<figure>
+			<img src="task1-2.png" alt="task1" style="width:50%"/>
+			<figcaption>Screenshot of bez/teapot.bez</figcaption>
+		</figure>
+
 		<h2>Section II: Triangle Meshes and Half-Edge Data Structure</h2>
 
 		<h3>Part 3: Area-weighted vertex normals</h3>
