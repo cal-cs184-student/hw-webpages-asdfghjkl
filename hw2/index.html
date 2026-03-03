@@ -86,7 +86,7 @@
 			<em>n</em>&minus;1 linear interpolations between adjacent points to create a new set of 
 			<em>n</em>&minus;1 intermediate points. For any two adjacent control points <em>p<sub>i</sub></em> and 
 			<em>p<sub>i+1</sub></em>, the intermediate point <em>p'<sub>i</sub></em> 
-			is calculated as: /(<em>p'<sub>i</sub></em> = (1 &minus; t)<em>p<sub>i</sub></em> + t<em>p<sub>i+1</sub></em>/)
+			is calculated as: \(<em>p'<sub>i</sub></em> = (1 &minus; t)<em>p<sub>i</sub></em> + t<em>p<sub>i+1</sub></em>\)
 			We repeat this process recursively until 
 			only a single point remains, which gives the point on the Bezier curve at parameter <em>t</em>.
 		</p>
@@ -173,7 +173,30 @@
 		<h2>Section II: Triangle Meshes and Half-Edge Data Structure</h2>
 
 		<h3>Part 3: Area-weighted vertex normals</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		<p><strong>How We Implemented Area-Weighted Vertex Normals:</strong></p>
+		<p>
+			To compute, we have to iterate through all the faces adjacent to a vertex by traversing the half-edge data structure. 
+			Starting from the vertex's half edge, we use <code>h_twin->next()</code> to visit each enighbouring triangle. 
+			For each non-boundary face, we computed the face normal using the cross product of two edge vectors from the vertex. 
+			The magnitude of the cross product is twice the area of the triangle, hence the resulting vector is naturally weighted by the face's area. 
+			Accumulating all the weighted vectors for all adjacent faces and normalising the result will give the unit normal at the vertex. 
+		</p>
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="task3 (2).png" width="400px"/>
+				  <figcaption>Vertex Normal Off</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="task3 (1).png" width="400px"/>
+				  <figcaption>Vertex Normal On</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
+
 
 		<h3>Part 4: Edge flip</h3>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
