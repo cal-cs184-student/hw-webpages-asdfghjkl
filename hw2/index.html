@@ -86,7 +86,7 @@
 			<em>n</em>&minus;1 linear interpolations between adjacent points to create a new set of 
 			<em>n</em>&minus;1 intermediate points. For any two adjacent control points <em>p<sub>i</sub></em> and 
 			<em>p<sub>i+1</sub></em>, the intermediate point <em>p'<sub>i</sub></em> 
-			is calculated as:<em>p'<sub>i</sub></em> = (1 &minus; t)<em>p<sub>i</sub></em> + t<em>p<sub>i+1</sub></em>
+			is calculated as: <em>p'<sub>i</sub></em> = (1 &minus; t)<em>p<sub>i</sub></em> + t<em>p<sub>i+1</sub></em>
 			We repeat this process recursively until 
 			only a single point remains, which gives the point on the Bezier curve at parameter <em>t</em>.
 		</p>
@@ -160,7 +160,9 @@
 		<p><strong>How We Implemented de Casteljau's Algorithm for Bezier Surface:</strong></p>
 
 		<p>
-
+			Using a 3D version of the recursive step from part 1, <code>evaluateStep</code> computes <em>n - 1</em> intermediate points using linear interpolation, given a vector of 3D points and parameter <em>t</em>. 
+			<code>evaluate1D</code> then takes an initial vector of points and repeatedly calls <code>evaluateStep</code> in a <code>while</code> loop until only 1 point remains, then returns the point.
+			<code>evaluate</code> then handles the 2D grid. It iterates through each row of the control points and call <code>evaluate1D</code> on each parameter <em>u</em>. Then it calls <code>evaluate1D</code> at parameter <em>v</em> to produce the final surface point.
 		</p>
 
 		<figure>
