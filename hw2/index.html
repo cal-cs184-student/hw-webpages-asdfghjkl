@@ -176,7 +176,7 @@
 		<p><strong>How We Implemented Area-Weighted Vertex Normals:</strong></p>
 		<p>
 			To compute, we have to iterate through all the faces adjacent to a vertex by traversing the half-edge data structure. 
-			Starting from the vertex's half edge, we use <code>h_twin->next()</code> to visit each enighbouring triangle. 
+			Starting from the vertex's half edge, we use <code>h_twin->next()</code> to visit each neighbouring triangle. 
 			For each non-boundary face, we computed the face normal using the cross product of two edge vectors from the vertex. 
 			The magnitude of the cross product is twice the area of the triangle, hence the resulting vector is naturally weighted by the face's area. 
 			Accumulating all the weighted vectors for all adjacent faces and normalising the result will give the unit normal at the vertex. 
