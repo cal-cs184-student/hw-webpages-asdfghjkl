@@ -86,7 +86,7 @@
 			<em>n</em>&minus;1 linear interpolations between adjacent points to create a new set of 
 			<em>n</em>&minus;1 intermediate points. For any two adjacent control points <em>p<sub>i</sub></em> and 
 			<em>p<sub>i+1</sub></em>, the intermediate point <em>p'<sub>i</sub></em> 
-			is calculated as: \(<em>p'<sub>i</sub></em> = (1 &minus; t)<em>p<sub>i</sub></em> + t<em>p<sub>i+1</sub></em>\)
+			is calculated as: <em>p'<sub>i</sub></em> = (1 &minus; t)<em>p<sub>i</sub></em> + t<em>p<sub>i+1</sub></em>
 			We repeat this process recursively until 
 			only a single point remains, which gives the point on the Bezier curve at parameter <em>t</em>.
 		</p>
@@ -199,7 +199,13 @@
 
 
 		<h3>Part 4: Edge flip</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		<p><strong>How We Implemented Edge Split Operation:</strong></p>
+		<p>
+			The edge flip is implemented as a local topological transformation that rotates a shared edge within a pair of adjacent triangles, without add or removing geometry.
+			Firstly, we ensure that the operation does not flip any boundary edge by checking the <code> isBoundary()</code> status of the edge's two primary half-edges. 
+
+		</p>
+
 
 		<h3>Part 5: Edge split</h3>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
