@@ -203,8 +203,44 @@
 		<p>
 			The edge flip is implemented as a local topological transformation that rotates a shared edge within a pair of adjacent triangles, without add or removing geometry.
 			Firstly, we ensure that the operation does not flip any boundary edge by checking the <code> isBoundary()</code> status of the edge's two primary half-edges. 
-
+			Then, to avoid errors in rewiring the pointers, we label and collect every mesh element in the 2-triangle neighbourhood. 
+			This includes the 6 internal half-edges, the 4 vertices <em>(a, b, c, d)</em>, the 5 edges, and the 2 faces. 
+			We replace the original diagonal <em>(b, c)</em> with the new diagonal <em>(a, d)</em>. 
+			The core of the implementation involves using the <code>setNeighbours</code> method to update the <code>next</code>, <code>twin</code>, <code>vertex</code>, <code>edge</code>, and <code>face</code> pointers for each of the internal half-edges in a single pass.
+			Finally, we refresh the <code>halfedge()</code> handles for all affected vertices, edges, and faces to ensure every iterator in the mesh remains consistent.
 		</p>
+
+		<p><strong>Interesting Implementation / Debugging tricks:</strong></p>
+		<p>
+			We realised that if a single <code>face->halfedge()</code> was left pointing to a half-edge that had moved to the other face, the mesh would fold into itself and crash the renderer.
+			To debug this, we used the <code>check_for()</code> utility to verify that after a flip, each face was still composed of exactly 3 half-edges and that the symmetry of <code>twin()</code> relationship across the new diagonal remained intact.
+		</p>
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="task4 (2).png width="400px"/>
+				  <figcaption>Before Edge Flip</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="task4 (1).png" width="400px"/>
+				  <figcaption>After Edge Flip</figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="task4 (4).png width="400px"/>
+				  <figcaption>Before Edge Flip</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="task4 (3).png" width="400px"/>
+				  <figcaption>After Edge Flip</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
+
 
 
 		<h3>Part 5: Edge split</h3>
