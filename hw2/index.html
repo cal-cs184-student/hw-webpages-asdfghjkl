@@ -244,7 +244,62 @@
 
 
 		<h3>Part 5: Edge split</h3>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		<p><strong>How We Implemented Edge Split Operation:</strong></p>
+		<p>
+			The edge split operation works by inserting a new vertex m at the midpoint of a shared edge (b, c) between 2 triangles (a, b, c) and (c, b, d), which subdivides them into 4 smaller triangles (b, m, a), (m, c, a), (m, b, d) and (c, m, d).
+			First we check that the operation does not split any boundary edges by checking <code>isBoundary()</code>, like in task 4.
+			We start by retrieving the existing 6 halfedges, 4 vertices, 2 faces and 4 edges of the orignial 2 triangles. 
+			Then we create new elements: vertex m at the midpoint, 3 new edges (m-a, m-d, m-c), 2 new faces, and 6 new halfedges. 
+			The original edge e0 is reused as the b-m edge, while a new edge e7 is created for the m-c part, which splits the original edge into 2 essentially. 
+			After creating new elements, we reassign their neighbors using <code>setNeighbors()</code> to create the 4 resulting triangles.
+			
+		</p>
+
+		<p><strong>Interesting Implementation / Debugging tricks:</strong></p>
+		<p>
+			We found it very helpful to physically draw out all the mesh elements and tracing the next pointer of each halfedge. This helped us debug a missing face from the mesh, becuase the next pointers of f3 was initially set in the wrong order. 
+		</p>
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="task5 (6).png" width="400px"/>
+				  <figcaption>Before Edge Split</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="task5 (5).png" width="400px"/>
+				  <figcaption>After Edge Split 1</figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="task5 (4).png" width="400px"/>
+				  <figcaption>After Edge Split 2</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="task5 (3).png" width="400px"/>
+				  <figcaption>After Edge Split 3</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="task5 (2).png" width="400px"/>
+				  <figcaption>After Edge Split & Edge Flip</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="task5 (1).png" width="400px"/>
+				  <figcaption>After Edge Split & Edge Flip</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
+
 
 		<h3>Part 6: Loop subdivision for mesh upsampling</h3>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
