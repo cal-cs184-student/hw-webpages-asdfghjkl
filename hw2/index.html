@@ -304,11 +304,122 @@
 		<h3>Part 6: Loop subdivision for mesh upsampling</h3>
 		<p><strong>How We Implemented Loop Subdivision for Mesh Upsampling:</strong></p>
 		<p>
-			
+		First, new positions for all old and new vertices
+		are pre-computed from the original mesh before any topology changes. The old vertices use the weighted
+		average <em>(1 - n&middot;u) &middot; pos + u &middot; neighbor_sum</em>, and new edge midpoint vertices use
+		<em>3/8 &middot; (A + B) + 1/8 &middot; (C + D)</em>. All original edges and vertices are flagged
+		<code>isNew = false</code> at this stage.
+		</p>
+		<p>
+		Second, all original edges are collected into a vector before splitting begins to avoid iterating
+		over newly created edges. Each edge is split, the returned vertex is flagged <code>isNew = true</code>
+		and assigned its pre-computed position. Then, any new edge connecting one old and one new vertex is flipped.
+		</p>
+		<p>
+		Finally, all vertex positions are updated from their <code>newPosition</code> values.
 		</p>
 
-		<h2>(Optional) Section III: Potential Extra Credit - Art Competition: Model something Creative</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="task6 (13).png" width="400px"/>
+				  <figcaption>Before Loop Subdivision</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="task6 (12).png" width="400px"/>
+				  <figcaption>Loop Subdivision 1</figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="task6 (11).png" width="400px"/>
+				  <figcaption>Loop Subdivision 2</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="task6 (10).png" width="400px"/>
+				  <figcaption>Loop Subdivision 3</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
+
+		<p>
+			The sharp corners and edges are progressively rounded with each subdivision iteration, since Loop subdivision is an prooximating scheme.
+			The vertices are pulled toward their neighbors rather than staying fixed. 
+			Pre-splitting an edge near a sharp feature before subdividing can help maintain its sharpness, as the higher local vertex density constrains how far the averaging can pull the corner inward.
+		</p>
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="task6 (9).png" width="400px"/>
+				  <figcaption>Before Loop Subdivision</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="task6 (8).png" width="400px"/>
+				  <figcaption>Loop Subdivision 1</figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="task6 (7).png" width="400px"/>
+				  <figcaption>Loop Subdivision 2</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="task6 (6).png" width="400px"/>
+				  <figcaption>Loop Subdivision 3</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
+
+		<p>
+			The cube.dae subdivides asymmetrically because its faces are triangulated with diagonals, giving vertices unequal degrees and therefore unequal Loop subdivision weights.
+			Pre-processing by splitting each face into an X pattern makes all vertices degrees equal, so the cube subdivides symmetrically into a smooth shape.
+		</p>
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="task6 (5).png" width="400px"/>
+				  <figcaption>Before Loop Subdivision</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="task6 (4).png" width="400px"/>
+				  <figcaption>Loop Subdivision 1</figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="task6 (3).png" width="400px"/>
+				  <figcaption>Loop Subdivision 2</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="task6 (2).png" width="400px"/>
+				  <figcaption>Loop Subdivision 3</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
+
+		<figure>
+			<img src="task6 (1).png" alt="task1" style="width:50%"/>
+			<figcaption>Symmetrical cube after Subdivisions!</figcaption>
+		</figure>
+
+		<p><strong>Interesting Implementation / Debugging Tricks:</strong></p>
+		<p>
+			One main issue we encountered was inconcsistent spikes appearing after the first subdivision. This was caused by the <em>m&ndash;c</em> edge (upper half of the original split edge) being incorrectly marked
+    		<code>isNew = true</code>, causing it to be flipped when it shouldn't be. Marking both halves
+    		of the original split edge as <code>isNew = false</code> and only the two new diagonal edges
+   			 as <code>isNew = true</code> resolved the issue.
+		</p>
+
+		<!-- <h2>(Optional) Section III: Potential Extra Credit - Art Competition: Model something Creative</h2>
+		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. -->
 
 		<!-- <h2>Additional Notes (please remove)</h2>
 		<ul>
