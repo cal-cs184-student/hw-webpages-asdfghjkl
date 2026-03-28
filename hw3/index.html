@@ -76,8 +76,85 @@
 		Give a high-level overview of what you implemented in this homework. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the homework.
 
 		<h2>Part 1: Ray Generation and Scene Intersection</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+		<p><strong>How We Implemented Ray Generation and Primitive Intersection Pipeline</strong></p>
+		<p>The rendering pipeline for ray generation and primitive intersection consists of several key stages</p>
+		<p><strong>1. Pixel Sampling Stage:</strong></p>
+		<p>For each pixel in the image:</p>
+		<ul>
+			<li><strong>Input:</strong> Pixel coordinates (x, y) in image space, where (0,0) is at the bottom-left corner</li>
+			<li><strong>Anti-aliasing:</strong> Generate <code>ns_aa</code> sample points within the pixel using a uniform grid sampler</li>
+			<li><strong>Coordinate transformation:</strong> Convert pixel coordinates to normalized coordinates [0,1] × [0,1]</li>
+			<li><strong>Sample accumulation:</strong> Average the radiance values from all samples to produce the final pixel color</li>
+		</ul>
+
+		<p>Each sample point is obtained via <code>gridSampler-&gt;get_sample()</code>, which provides a uniform random offset in [0,1) × [0,1) added to the pixel origin before normalization.</p>
+
+		<p><strong>2. Camera Ray Generation Stage (<code>Camera::generate_ray</code>)</strong></p>
+		<p>For each sample point: </p>
+		<ul>
+			<li><strong>Input:</strong> Normalized image coordinates (x, y) ∈ [0,1] × [0,1]</li>
+			<li><strong>Camera space transformation:</strong> Map to the virtual sensor plane at z = -1, with bottom-left at (-tan(hFov/2), -tan(vFov/2), -1) and top-right at (tan(hFov/2), tan(vFov/2), -1)</li>
+			<li><strong>Ray direction:</strong> Computed from the camera origin (0,0,0) through the sensor point</li>
+			<li><strong>World space transformation:</strong> Direction transformed via the <code>c2w</code> rotation matrix; origin set to <code>pos</code></li>
+			<li><strong>Output:</strong> A normalized world-space ray with <code>min_t = nClip</code>, <code>max_t = fClip</code></li>
+		</ul>
+
+		<p><strong>3. Primitive Intersection Stage</strong></p>
+		<p>Once rays are generated, each ray is tested against scene geometry:</p>
+		<ul>
+			<li><strong>BVH traversal:</strong> Quickly culls geometry that cannot be hit (Part 2)</li>
+			<li><strong>Primitive intersection test:</strong> Runs Möller–Trumbore (triangles) or quadratic solving (spheres) on candidate primitives</li>
+			<li><strong>Closest-hit selection:</strong> Only the intersection with the smallest valid t ∈ [t<sub>min</sub>, t<sub>max</sub>] is kept, updating <code>max_t</code> so farther intersections are discarded</li>
+		</ul>
+
+		<p><strong>Triangle Intersection Algorithm (Möller–Trumbore)</strong></p>
+		<p>Given a triangle with vertices p₁, p₂, p₃ and a ray R(t) = O + tD:</p>
+
+		<ol>
+			<li>Compute edge vectors e₁ = p₂ − p₁, e₂ = p₃ − p₁</li>
+			<li>Compute h = D × e₂, determinant a = e₁ · h; if |a| &lt; ε, ray is parallel — no intersection</li>
+			<li>Compute s = O − p₁, barycentric coordinate u = (s · h) / a; if u ∉ [0,1], miss</li>
+			<li>Compute q = s × e₁, barycentric coordinate v = (D · q) / a; if v &lt; 0 or u + v &gt; 1, miss</li>
+			<li>Compute t = (e₂ · q) / a; if t ∉ [t<sub>min</sub>, t<sub>max</sub>], miss</li>
+		</ol>
+
+		<p>On a valid hit, the surface normal is interpolated using barycentric coordinates w = 1 − u − v:</p>
+
+		<p><strong>n = w·n₁ + u·n₂ + v·n₃</strong></p>
+
+		<p>This method is efficient because it avoids computing the plane equation explicitly, solving directly for t, u, v in one linear system.</p>
+
+		<p><strong>Sphere Intersection</strong></p>
+
+		<p>Given a sphere with center C and radius r, substituting R(t) = O + tD into |R(t) − C|² = r² yields the quadratic:</p>
+		<p><strong>at² + bt + c = 0</strong></p>
+
+		<p>where:</p>
+
+		<ul>
+			<li>a = D · D</li>
+			<li>b = 2D · (O − C)</li>
+			<li>c = |O − C|² − r²</li>
+		</ul>
+
+		<p>If the discriminant Δ = b² − 4ac &lt; 0, no intersection exists. Otherwise, both roots:</p>
+
+		<p><strong>t₁, t₂ = (-b ± √Δ) / (2a)</strong></p>
+
+		<p>are computed and the smaller valid t ∈ [t<sub>min</sub>, t<sub>max</sub>] is selected.</p>
+
+		<p>The surface normal is computed analytically as:</p>
+
+		<p><strong>n = (R(t) − C) / r</strong></p>
+
+		<p>The implementation splits this across three functions: <code>test()</code>, <code>has_intersection()</code>, and <code>intersect()</code>.</p>
+
+		<p><strong>Normal Shading Results:</strong></p>
+
+
 		
+
 		<h2>Part 2: Bounding Volume Hierarchy</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
