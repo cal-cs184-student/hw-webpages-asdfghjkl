@@ -77,8 +77,11 @@
 
 		<h2>Part 1: Ray Generation and Scene Intersection</h2>
 
-		<p><strong>How We Implemented Ray Generation and Primitive Intersection Pipeline: </strong></p>
-		<h3>Task 1: Generating Camera Rays</h3>
+		<h3>How We Implemented Ray Generation and Primitive Intersection of Rendering Pipeline:</h3>
+
+		<p><strong>Ray Generation:</strong></p>
+
+		<p><strong>Task 1: Generating Camera Rays</strong></p>
  
 		<p>Camera ray generation transforms normalized screen coordinates into world-space rays via the camera's virtual sensor plane. Given normalized image coordinates \((x, y) \in [0,1] \times [0,1]\), we first map them to the sensor plane at \(z = -1\) in camera space. The sensor spans from \(\left(-\tan\!\left(\frac{hFov}{2}\right), -\tan\!\left(\frac{vFov}{2}\right), -1\right)\) at the bottom-left to \(\left(\tan\!\left(\frac{hFov}{2}\right), \tan\!\left(\frac{vFov}{2}\right), -1\right)\) at the top-right. The mapping is:</p>
  
@@ -89,7 +92,7 @@
  
 		<p>A ray is then constructed from the camera origin \((0,0,0)\) through the sensor point \((x_{cam},\, y_{cam},\, -1)\). The direction is transformed to world space using the <code>c2w</code> rotation matrix and normalized. The ray origin in world space is set to <code>pos</code>, and <code>min_t</code>, <code>max_t</code> are initialized to <code>nClip</code> and <code>fClip</code> respectively.</p>
  
-		<h3>Task 2: Generating Pixel Samples</h3>
+		<p><strong>Task 2: Generating Pixel Samples</strong></p>
  
 		<p>To estimate the integral of radiance over each pixel, <code>raytrace_pixel</code> generates <code>ns_aa</code> camera rays per pixel and averages their radiance values. For each sample, a random offset \((dx, dy)\) is drawn from a uniform grid sampler and added to the pixel's bottom-left corner \((x, y)\), then divided by the image dimensions to produce normalized coordinates:</p>
  
@@ -106,17 +109,19 @@
 				<tr>
 					<td style="text-align: center;">
 						<img src="CBempty.png" width="400px"/>
-						<figcaption>CBempty.dae — ray direction shading</figcaption>
+						<figcaption>CBempty.dae</figcaption>
 					</td>
 					<td style="text-align: center;">
 						<img src="banana.png" width="400px"/>
-						<figcaption>banana.dae — ray direction shading</figcaption>
+						<figcaption>banana.dae</figcaption>
 					</td>
 				</tr>
 			</table>
 		</div>
+
+		<p><strong>Primitive Intersection:</strong></p>
  
-		<h3>Task 3: Ray-Triangle Intersection</h3>
+		<p><strong>Task 3: Ray-Triangle Intersection</strong></p>
  
 		<p>Triangle intersection uses the Möller–Trumbore algorithm, which solves for the ray parameter \(t\) and barycentric coordinates \((u, v)\) simultaneously without computing the plane equation. Given a triangle with vertices \(\mathbf{p_1}, \mathbf{p_2}, \mathbf{p_3}\) and a ray \(\mathbf{R}(t) = \mathbf{O} + t\mathbf{D}\):</p>
  
@@ -140,14 +145,14 @@
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
 				<tr>
 					<td style="text-align: center;">
-						<img src="CBempty_normals.png" width="400px"/>
+						<img src="Task3.png" width="400px"/>
 						<figcaption>CBempty.dae — normal shading after triangle intersection</figcaption>
 					</td>
 				</tr>
 			</table>
 		</div>
  
-		<h3>Task 4: Ray-Sphere Intersection</h3>
+		<p><strong>Task 4: Ray-Sphere Intersection</strong></p>
  
 		<p>Sphere intersection is solved by substituting \(\mathbf{R}(t) = \mathbf{O} + t\mathbf{D}\) into \(|\mathbf{R}(t) - \mathbf{C}|^2 = r^2\), which yields the quadratic \(at^2 + bt + c = 0\) where:</p>
  
@@ -165,28 +170,28 @@
  
 		<p>The smaller root is preferred; if it falls outside \([t_{min}, t_{max}]\), the larger root is tried. The surface normal at the hit point is computed analytically as \(\mathbf{n} = \frac{\mathbf{R}(t) - \mathbf{C}}{r}\). The implementation is split across three functions: <code>test()</code> solves the quadratic and returns both \(t\) values, <code>has_intersection()</code> validates the range and updates <code>max_t</code>, and <code>intersect()</code> additionally populates the full <code>Intersection</code> struct.</p>
  
-		<p>Normal-shaded results for several small <code>.dae</code> files:</p>
+		<p><strong>Normal-shaded results for several small <code>.dae</code> files:</strong></p>
  
 		<div style="display: flex; flex-direction: column; align-items: center;">
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
 				<tr>
 					<td style="text-align: center;">
-						<img src="CBspheres_lambertian.png" width="400px"/>
-						<figcaption>CBspheres_lambertian.dae — normal shading</figcaption>
+						<img src="CBspheres.png" width="400px"/>
+						<figcaption>CBspheres.dae — normal shading</figcaption>
 					</td>
 					<td style="text-align: center;">
-						<img src="CBempty.png" width="400px"/>
-						<figcaption>CBempty.dae — normal shading</figcaption>
+						<img src="task1CBgems.png" width="400px"/>
+						<figcaption>CBgems.dae — normal shading</figcaption>
 					</td>
 				</tr>
 				<tr>
 					<td style="text-align: center;">
-						<img src="banana.png" width="400px"/>
+						<img src="task1banana.png" width="400px"/>
 						<figcaption>banana.dae — normal shading</figcaption>
 					</td>
 					<td style="text-align: center;">
-						<img src="CBcoil.png" width="400px"/>
-						<figcaption>CBcoil.dae — normal shading</figcaption>
+						<img src="cow.png" width="400px"/>
+						<figcaption>cow.dae — normal shading</figcaption>
 					</td>
 				</tr>
 			</table>
