@@ -203,7 +203,91 @@
 
 
 		<h2>Part 2: Bounding Volume Hierarchy</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+		<p><strong>Task 1: BVH Construction</strong></p>
+ 
+		<p>The BVH is constructed recursively. At each call, we first compute the bounding box over all primitives in the current range and create a new node with that box. If the number of primitives is at most <code>max_leaf_size</code>, the node is made a leaf by setting its <code>start</code> and <code>end</code> iterators directly.</p>
+ 
+		<p>Otherwise, we choose a split axis and split point using the <strong>Surface Area Heuristic (SAH)</strong> with \(B = 12\) uniform buckets along the longest axis. For each primitive, we compute which bucket its centroid falls into and accumulate the bounding box and count for that bucket. We then evaluate \(B - 1\) candidate split planes, computing the SAH cost for each:</p>
+ 
+		\[
+			\text{cost}(i) = |\text{left}_i| \cdot SA(\text{left}_i) + |\text{right}_i| \cdot SA(\text{right}_i)
+		\]
+ 
+		<p>where \(SA(\cdot)\) is the surface area of the bounding box and \(|\cdot|\) is the primitive count on each side. The split with the lowest cost is chosen. Primitives are then partitioned using <code>std::partition</code> by which bucket side of the best split their centroid falls on. If the partition produces a degenerate split (all primitives on one side), the node is returned as a leaf to avoid infinite recursion. Left and right children are then constructed recursively.</p>
+ 
+		<p><strong>Task 2: Bounding Box Intersection</strong></p>
+ 
+		<p>The bounding box intersection uses the slab method: for each of the three axes, we compute the near and far \(t\) values where the ray intersects the two axis-aligned planes bounding the box on that axis. If \(t_{near} > t_{far}\) after accounting for direction sign, we swap them. We then take the maximum of all near values and minimum of all far values across axes. If the resulting interval \([t_0, t_1]\) is empty (i.e. \(t_0 > t_1\)), the ray misses the box.</p>
+ 
+		<p><strong>Task 3: BVH Traversal</strong></p>
+ 
+		<p><code>has_intersection</code> short-circuits as soon as any primitive intersection is found, recursing into children in arbitrary order. <code>intersect</code> must find the <em>nearest</em> hit, so both subtrees may need to be visited. To reduce unnecessary traversal, we first test both children's bounding boxes and recurse into the nearer one first (by comparing entry \(t\) values). If a hit is found in the nearer child, we tighten <code>max_t</code> to <code>i->t</code> before recursing into the farther child, allowing early termination if its bounding box entry exceeds the current closest hit. Since each primitive's <code>intersect</code> correctly updates both <code>i->t</code> and <code>ray.max_t</code>, these propagate through the recursion without needing explicit management in the BVH traversal.</p>
+ 
+		<p><strong>Normal Shading Results (BVH enabled): </strong></p>
+ 
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td style="text-align: center;">
+						<img src="cow.png" width="400px"/>
+						<figcaption>cow.dae — 5,856 triangles</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="task2wall-e.png" width="400px"/>
+						<figcaption>wall-e.dae — 240,318 triangles</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="task2maxplanck.png" width="400px"/>
+						<figcaption>maxplanck.dae — 50,801 triangles</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="task2CBlucy.png" width="400px"/>
+						<figcaption>CBlucy.dae — 133,796 triangles</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+ 
+		<p><strong>Rendering Time Comparison:</strong></p>
+ 
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td style="text-align: center;">
+						<img src="bvh (1).png" width="400px"/>
+						<figcaption>cow.dae without bvh</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="bvh (4).png" width="400px"/>
+						<figcaption>cow.dae with bvh</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="bvh (3).png" width="400px"/>
+						<figcaption>beetle.dae without bvh</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="bvh (2).png" width="400px"/>
+						<figcaption>beetle.dae with bvh</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+ 
+		<br>
+ 
+		<p>Without BVH acceleration, rendering <code>cow.dae</code> (5,856 triangles) 
+			took 3,183 seconds and <code>beetle.dae</code> (7,558 triangles) took 2,627 seconds, 
+			as every ray had to be tested against all primitives — averaging over 1,200 intersection tests per ray. 
+			With BVH enabled, the same scenes rendered in 3.7 and 2.4 seconds respectively, with under 3 intersection tests per ray on average. 
+			This represents a speedup of roughly 860× for cow and 1,090× for beetle. The dramatic reduction in intersection tests — 
+			from \(O(n)\) to \(O(\log n)\) — comes directly from the SAH-based BVH construction, which produces well-balanced splits that allow large 
+			portions of the scene to be culled early during traversal.</p>
+		
 
 		<h2>Part 3: Direct Illumination</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
