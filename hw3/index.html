@@ -290,7 +290,90 @@
 		
 
 		<h2>Part 3: Direct Illumination</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		
+		<p><strong>Task 1: Diffuse BSDF</strong></p>
+ 
+		<p>A diffuse (Lambertian) material reflects incoming light equally in all directions on the hemisphere. The BSDF value is constant and given by:</p>
+ 
+		\[
+			f(\omega_i \to \omega_o) = \frac{\text{reflectance}}{\pi}
+		\]
+ 
+		<p>where <code>reflectance</code> is the material's albedo as a per-channel RGB vector. The division by \(\pi\) ensures energy conservation — integrating the BSDF over the hemisphere weighted by \(\cos\theta\) gives back the reflectance.</p>
+ 
+		<p><strong>Task 2: Zero-Bounce Illumination</strong></p>
+ 
+		<p>Zero-bounce radiance is the light that reaches the camera directly from a light source without any intermediate bounces. The implementation simply returns the emission of the intersected surface via <code>isect.bsdf->get_emission()</code>. For most surfaces this is zero; for emissive surfaces (area lights) it returns the emitted spectrum. After updating <code>est_radiance_global_illumination</code> to return zero-bounce radiance, rendering a Cornell Box scene shows only the area light at the top.</p>
+ 
+		<p><strong>Task 3: Direct Lighting with Uniform Hemisphere Sampling</strong></p>
+ 
+		<p>Hemisphere sampling estimates direct illumination by uniformly sampling incoming directions over the hemisphere at the hit point, then checking whether each sampled ray hits a light source. The Monte Carlo estimator for outgoing radiance is:</p>
+ 
+		\[
+			L_o(p, \omega_o) \approx \frac{1}{N} \sum_{i=1}^{N} \frac{f(\omega_i \to \omega_o) \cdot L_e(\omega_i) \cdot \cos\theta_i}{p(\omega_i)}
+		\]
+ 
+		<p>where \(p(\omega_i) = \frac{1}{2\pi}\) for uniform hemisphere sampling. For each sample, a direction \(\omega_i\) is drawn from <code>hemisphereSampler</code> in object space, transformed to world space, and used to cast a shadow ray from <code>hit_p</code> with <code>min_t = EPS_F</code> to avoid self-intersection. If the ray intersects an emissive surface, its emission \(L_e\) is retrieved and the full reflectance equation term is accumulated. The result is divided by <code>num_samples</code>.</p>
+ 
+		<p><strong>Task 4: Direct Lighting by Importance Sampling Lights</strong></p>
+ 
+		<p>Instead of sampling uniformly in a hemisphere, importance sampling samples directions directly toward each light source. For each light in the scene, we draw <code>ns_area_light</code> samples (or just 1 for delta/point lights). For each sample, <code>sample_L</code> returns the emitted radiance \(L_i\), the world-space direction \(\omega_i\) toward the light, the distance to the light, and the sampling PDF. A shadow ray is cast from <code>hit_p</code> in direction \(\omega_i\) with <code>max_t = distToLight - EPS_F</code> — if any geometry occludes the path, the sample is skipped. Otherwise the contribution is accumulated as:</p>
+ 
+		\[
+			L_o \mathrel{+}= \frac{1}{N} \sum_{i=1}^{N} \frac{f(\omega_i \to \omega_o) \cdot L_i \cdot \cos\theta_i}{\text{pdf}_i}
+		\]
+ 
+		<p>Samples where \(\cos\theta_i \leq 0\) (light behind the surface) are skipped. This approach converges much faster than hemisphere sampling because samples are never wasted on directions that miss all lights.</p>
+ 
+		<p><strong>Rendered Results: </strong></p>
+ 
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td style="text-align: center;">
+						<img src="CBbunny_H_64_32.png" width="400px"/>
+						<figcaption>CBbunny.dae — uniform hemisphere sampling (64 samples/px, 32 light rays)</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="CBbunny_64_32.png" width="400px"/>
+						<figcaption>CBbunny.dae — importance sampling (64 samples/px, 32 light rays)</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+ 
+		<p><strong></strong>Noise Comparison: Light Rays (Importance Sampling, 1 sample/px)</strong></p>
+ 
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td style="text-align: center;">
+						<img src="CBbunny_1_1.png" width="380px"/>
+						<figcaption>1 light ray</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="CBbunny_1_4.png" width="380px"/>
+						<figcaption>4 light rays</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="CBbunny_1_16.png" width="380px"/>
+						<figcaption>16 light rays</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="CBbunny_1_64.png" width="380px"/>
+						<figcaption>64 light rays</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+ 
+		<p><strong>Analysis: Hemisphere vs. Importance Sampling: </strong></p>
+ 
+		<p>Uniform hemisphere sampling produces significantly noisier results at the same sample count because most sampled directions miss the light source entirely, contributing zero radiance and wasting computation. Soft shadows and low-lit areas are especially grainy since the probability of a hemisphere sample hitting a small area light is low. Importance sampling eliminates this by always sampling toward lights, so every sample contributes meaningful radiance. The resulting images are much cleaner at equal sample counts, and soft shadow boundaries converge with far fewer light rays. The tradeoff is that importance sampling requires explicit knowledge of light positions, whereas hemisphere sampling is more general — though in practice, importance sampling is strictly preferable for scenes with localized light sources.</p>
+
+
 
 		<h2>Part 4: Global Illumination</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
