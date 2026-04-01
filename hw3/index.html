@@ -375,7 +375,204 @@
 
 
 		<h2>Part 4: Global Illumination</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		<p><strong>Task 1: Diffuse BSDF Sampling</strong></p>
+ 
+		<p><code>DiffuseBSDF::sample_f</code> samples an incoming direction using a cosine-weighted hemisphere sampler, which draws directions proportional to \(\cos\theta\) — naturally matching Lambert's cosine law. The sampler writes both the sampled direction \(\omega_i\) and its PDF into the provided pointers, and the function returns the BSDF value \(f(\omega_o \to \omega_i) = \frac{\rho}{\pi}\).</p>
+ 
+		<p><strong>Task 2 &amp; 3: Indirect Lighting with Russian Roulette</strong></p>
+ 
+		<p><code>at_least_one_bounce_radiance</code> implements recursive path tracing. At each call, it first computes the direct (one-bounce) illumination at the hit point. If <code>isAccumBounces</code> is true, this is added to the output; otherwise only the contribution at exactly the target bounce depth is returned. If the ray depth has reached 1, recursion stops.</p>
+ 
+		<p>For deeper bounces, Russian Roulette is used for unbiased termination: a continuation probability \(p_c = 0.65\) is used, and <code>coin_flip(p_c)</code> decides whether to trace further. If continuing, <code>sample_f</code> samples a new direction \(\omega_i\) in object space, which is transformed to world space and used to cast a new ray from the hit point (offset by <code>EPS_F</code> to avoid self-intersection). If this ray hits the scene, <code>at_least_one_bounce_radiance</code> is called recursively on the new intersection, and its contribution is accumulated as:</p>
+ 
+		\[
+			L_{\text{indirect}} = \frac{f(\omega_o \to \omega_i) \cdot L_{\text{bounce}} \cdot \cos\theta_i}{p(\omega_i) \cdot p_c}
+		\]
+ 
+		<p>The division by \(p_c\) corrects for the bias introduced by random termination, keeping the estimator unbiased.</p>
+ 
+		<p><strong></strong>Global Illumination Results (1024 samples/px): </strong></p>
+ 
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td style="text-align: center;">
+						<img src="spheres_global.png" width="400px"/>
+						<figcaption>CBspheres_lambertian.dae — global illumination</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="bunny_global.png" width="400px"/>
+						<figcaption>CBbunny.dae — global illumination</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+ 
+		<p><strong>Direct vs. Indirect Illumination Only: </strong></p>
+ 
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td style="text-align: center;">
+						<img src="spheres_direct.png" width="400px"/>
+						<figcaption>Direct illumination only</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="spheres_indirect.png" width="400px"/>
+						<figcaption>Indirect illumination only</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+ 
+		<p><strong>Unaccumulated Bounces: CBbunny.dae (isAccumBounces=false): </strong></p>
+ 
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td style="text-align: center;">
+						<img src="bunny_m0_unaccum.png" width="300px"/>
+						<figcaption>m=0</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="bunny_m1_unaccum.png" width="300px"/>
+						<figcaption>m=1</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="bunny_m2_unaccum.png" width="300px"/>
+						<figcaption>m=2</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="bunny_m3_unaccum.png" width="300px"/>
+						<figcaption>m=3</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="bunny_m4_unaccum.png" width="300px"/>
+						<figcaption>m=4</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="bunny_m5_unaccum.png" width="300px"/>
+						<figcaption>m=5</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+ 
+		<p>The 2nd bounce of light illuminates areas that are in shadow from direct lighting — most notably the underside of the bunny and the ceiling, which receives light reflected off the floor. The 3rd bounce further softens these areas and adds subtle color bleeding from the colored walls. Together these contribute significantly to the perceived realism of the image compared to rasterization, which typically only supports direct lighting without expensive additional passes.</p>
+ 
+		<p><strong>Accumulated Bounces: CBbunny.dae (isAccumBounces=true): </strong></p>
+ 
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td style="text-align: center;">
+						<img src="bunny_m0_accum.png" width="300px"/>
+						<figcaption>m=0</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="bunny_m1_accum.png" width="300px"/>
+						<figcaption>m=1</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="bunny_m2_accum.png" width="300px"/>
+						<figcaption>m=2</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="bunny_m3_accum.png" width="300px"/>
+						<figcaption>m=3</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="bunny_m4_accum.png" width="300px"/>
+						<figcaption>m=4</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="bunny_m5_accum.png" width="300px"/>
+						<figcaption>m=5</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+ 
+		<p><strong>Russian Roulette: CBbunny.dae: </strong></p>
+ 
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td style="text-align: center;">
+						<img src="bunny_rr_m0.png" width="300px"/>
+						<figcaption>m=0</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="bunny_rr_m1.png" width="300px"/>
+						<figcaption>m=1</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="bunny_rr_m2.png" width="300px"/>
+						<figcaption>m=2</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="bunny_rr_m3.png" width="300px"/>
+						<figcaption>m=3</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="bunny_rr_m4.png" width="300px"/>
+						<figcaption>m=4</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="bunny_rr_m100.png" width="300px"/>
+						<figcaption>m=100</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+ 
+		<p><strong>Sample Rate Comparison: CBbunny.dae (4 light rays): </strong></p>
+ 
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td style="text-align: center;">
+						<img src="bunny_s1.png" width="300px"/>
+						<figcaption>1 sample/px</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="bunny_s2.png" width="300px"/>
+						<figcaption>2 samples/px</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="bunny_s4.png" width="300px"/>
+						<figcaption>4 samples/px</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="bunny_s8.png" width="300px"/>
+						<figcaption>8 samples/px</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="bunny_s16.png" width="300px"/>
+						<figcaption>16 samples/px</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="bunny_s64.png" width="300px"/>
+						<figcaption>64 samples/px</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="bunny_s1024.png" width="300px"/>
+						<figcaption>1024 samples/px</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+
 
 		<h2>Part 5: Adaptive Sampling</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
