@@ -303,8 +303,7 @@
  
 		<p><strong>Task 2: Zero-Bounce Illumination</strong></p>
  
-		<p>Zero-bounce radiance is the light that reaches the camera directly from a light source without any intermediate bounces. The implementation simply returns the emission of the intersected surface via <code>isect.bsdf->get_emission()</code>. For most surfaces this is zero; for emissive surfaces (area lights) it returns the emitted spectrum. After updating <code>est_radiance_global_illumination</code> to return zero-bounce radiance, rendering a Cornell Box scene shows only the area light at the top.</p>
- 
+		<p>Zero-bounce radiance is the light that reaches the camera directly from a light source without any intermediate bounces. The implementation simply returns the emission of the intersected surface via <code>isect.bsdf->get_emission()</code>. For most surfaces this is zero; for emissive surfaces (area lights) it returns the emitted spectrum. 
 		<p><strong>Task 3: Direct Lighting with Uniform Hemisphere Sampling</strong></p>
  
 		<p>Hemisphere sampling estimates direct illumination by uniformly sampling incoming directions over the hemisphere at the hit point, then checking whether each sampled ray hits a light source. The Monte Carlo estimator for outgoing radiance is:</p>
@@ -381,10 +380,10 @@
 		<h2>Part 5: Adaptive Sampling</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
-		<h2>(Optional) Part 6: Extra Credit Opportunities</h2>
+		<!-- <h2>(Optional) Part 6: Extra Credit Opportunities</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
-		
-		<h2>Additional Notes (please remove)</h2>
+		 -->
+		<!-- <h2>Additional Notes (please remove)</h2>
 		<ul>
 			<li>You can also add code if you'd like as so: <code>code code code</code></li>
 			<li>If you'd like to add math equations, 
@@ -393,7 +392,7 @@
 					<li>You can write display equations like so: \[ a^2 + b^2 = c^2 \]</li>
 				</ul>
 			</li>
-		</ul>
+		</ul> -->
 		</div>
 	</body>
 </html>
