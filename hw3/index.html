@@ -290,6 +290,8 @@
 		
 
 		<h2>Part 3: Direct Illumination</h2>
+
+		<p>Disclaimer: We unfortunately ran out of time for rendering.</p>
 		
 		<p><strong>Task 1: Diffuse BSDF</strong></p>
  
@@ -331,11 +333,11 @@
 				<tr>
 					<td style="text-align: center;">
 						<img src="CBbunny_H_64_32.png" width="400px"/>
-						<figcaption>CBbunny.dae — uniform hemisphere sampling (64 samples/px, 32 light rays)</figcaption>
+						<figcaption>CBbunny.dae — uniform hemisphere sampling</figcaption>
 					</td>
 					<td style="text-align: center;">
 						<img src="CBbunny_64_32.png" width="400px"/>
-						<figcaption>CBbunny.dae — importance sampling (64 samples/px, 32 light rays)</figcaption>
+						<figcaption>CBbunny.dae — importance sampling </figcaption>
 					</td>
 				</tr>
 			</table>
@@ -347,21 +349,21 @@
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
 				<tr>
 					<td style="text-align: center;">
-						<img src="CBbunny_1_1.png" width="380px"/>
+						<img src="CBsphere_1_1.png" width="380px"/>
 						<figcaption>1 light ray</figcaption>
 					</td>
 					<td style="text-align: center;">
-						<img src="CBbunny_1_4.png" width="380px"/>
+						<img src="CBsphere_1_4.png" width="380px"/>
 						<figcaption>4 light rays</figcaption>
 					</td>
 				</tr>
 				<tr>
 					<td style="text-align: center;">
-						<img src="CBbunny_1_16.png" width="380px"/>
+						<img src="CBsphere_1_16.png" width="380px"/>
 						<figcaption>16 light rays</figcaption>
 					</td>
 					<td style="text-align: center;">
-						<img src="CBbunny_1_64.png" width="380px"/>
+						<img src="CBsphere_1_64.png" width="380px"/>
 						<figcaption>64 light rays</figcaption>
 					</td>
 				</tr>
@@ -375,6 +377,9 @@
 
 
 		<h2>Part 4: Global Illumination</h2>
+
+		<p>Disclaimer: We unfortunately ran out of time for rendering.</p>
+		
 		<p><strong>Task 1: Diffuse BSDF Sampling</strong></p>
  
 		<p><code>DiffuseBSDF::sample_f</code> samples an incoming direction using a cosine-weighted hemisphere sampler, which draws directions proportional to \(\cos\theta\) — naturally matching Lambert's cosine law. The sampler writes both the sampled direction \(\omega_i\) and its PDF into the provided pointers, and the function returns the BSDF value \(f(\omega_o \to \omega_i) = \frac{\rho}{\pi}\).</p>
