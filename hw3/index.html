@@ -575,7 +575,62 @@
 
 
 		<h2>Part 5: Adaptive Sampling</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+				<h3>Algorithm</h3>
+ 
+		<p>Adaptive sampling concentrates samples in pixels that are harder to converge, rather than using a fixed sample count everywhere. For each pixel, we track two running statistics as we accumulate samples:</p>
+ 
+		\[
+			s_1 = \sum_{k=1}^{n} x_k, \qquad s_2 = \sum_{k=1}^{n} x_k^2
+		\]
+ 
+		<p>where \(x_k\) is the illuminance of the \(k\)-th sample, computed via <code>radiance.illum()</code>. From these we derive the mean and variance:</p>
+ 
+		\[
+			\mu = \frac{s_1}{n}, \qquad \sigma^2 = \frac{1}{n-1}\left(s_2 - \frac{s_1^2}{n}\right)
+		\]
+ 
+		<p>We then compute the 95% confidence interval half-width:</p>
+ 
+		\[
+			I = 1.96 \cdot \frac{\sigma}{\sqrt{n}}
+		\]
+ 
+		<p>A pixel is considered converged when \(I \leq \texttt{maxTolerance} \cdot \mu\). Sampling stops early for that pixel. If the pixel has zero mean (e.g. completely black pixels in shadow), we also stop early to avoid dividing by zero.</p>
+ 
+		<h3>Implementation</h3>
+ 
+		<p>The convergence check runs every <code>samplesPerBatch</code> samples rather than after every individual sample, reducing overhead. The outer <code>do-while</code> loop fires a batch of <code>samplesPerBatch</code> rays, accumulates their illuminance into \(s_1\) and \(s_2\), then checks the tolerance condition. If the pixel has converged or the total sample count has reached <code>ns_aa</code>, sampling stops. The actual sample count is written to <code>sampleCountBuffer</code> so the rate image can be generated.</p>
+ 
+		<h3>Results</h3>
+ 
+		<p>The following renders use 2048 max samples per pixel, 1 light ray, and 5 max ray depth. The rate image shows red for pixels that needed many samples (high variance — typically shadow boundaries and indirect light regions) and blue for pixels that converged quickly (uniform regions like flat walls).</p>
+ 
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td style="text-align: center;">
+						<img src="bunny_adaptive.png" width="400px"/>
+						<figcaption>CBbunny.dae — adaptive sampling render</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="bunny_adaptive_rate.png" width="400px"/>
+						<figcaption>CBbunny.dae — sampling rate image</figcaption>
+					</td>
+				</tr>
+				<tr>
+					<td style="text-align: center;">
+						<img src="spheres_adaptive.png" width="400px"/>
+						<figcaption>CBspheres_lambertian.dae — adaptive sampling render</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="spheres_adaptive_rate.png" width="400px"/>
+						<figcaption>CBspheres_lambertian.dae — sampling rate image</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+
+
 
 		<!-- <h2>(Optional) Part 6: Extra Credit Opportunities</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
