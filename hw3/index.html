@@ -455,7 +455,7 @@
 			</table>
 		</div>
  
-		<p>The 2nd bounce of light illuminates areas that are in shadow from direct lighting — most notably the underside of the bunny and the ceiling, which receives light reflected off the floor. The 3rd bounce further softens these areas and adds subtle color bleeding from the colored walls. Together these contribute significantly to the perceived realism of the image compared to rasterization, which typically only supports direct lighting without expensive additional passes.</p>
+		<p>The 2nd bounce of light illuminates areas that are in shadow from direct lighting — most notably the underside of the spheres and the ceiling, which receives light reflected off the floor. The 3rd bounce further softens these areas and adds subtle color bleeding from the colored walls. Together these contribute significantly to the perceived realism of the image compared to rasterization, which typically only supports direct lighting without expensive additional passes.</p>
  
 		<p><strong>Accumulated Bounces: CBspheres_lambertian.dae (isAccumBounces=true): </strong></p>
  
@@ -526,6 +526,9 @@
 				</tr>
 			</table>
 		</div>
+
+		<p>Russian Roulette allows the path tracer to terminate rays randomly at each bounce rather than at a fixed depth, while remaining unbiased by upweighting surviving rays to compensate. This avoids wasting computation on high-bounce paths whose energy contribution is negligible. 
+			In the images, m=100 looks virtually identical to m=4 or m=5 — Russian Roulette naturally kills most paths after a few bounces since each bounce attenuates energy, so almost no paths survive to depth 100. Without it, m=100 would be impractically slow with no visible quality gain.</p>
  
 		<p><strong>Sample Rate Comparison: CBbunny.dae (4 light rays): </strong></p>
  
