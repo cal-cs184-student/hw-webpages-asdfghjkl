@@ -530,41 +530,41 @@
 		<p>Russian Roulette allows the path tracer to terminate rays randomly at each bounce rather than at a fixed depth, while remaining unbiased by upweighting surviving rays to compensate. This avoids wasting computation on high-bounce paths whose energy contribution is negligible. 
 			In the images, m=100 looks virtually identical to m=4 or m=5 — Russian Roulette naturally kills most paths after a few bounces since each bounce attenuates energy, so almost no paths survive to depth 100. Without it, m=100 would be impractically slow with no visible quality gain.</p>
  
-		<p><strong>Sample Rate Comparison: CBbunny.dae (4 light rays): </strong></p>
+		<p><strong>Sample Rate Comparison: CBspheres_lambertian.dae (4 light rays): </strong></p>
  
 		<div style="display: flex; flex-direction: column; align-items: center;">
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
 				<tr>
 					<td style="text-align: center;">
-						<img src="bunny_s1.png" width="300px"/>
+						<img src="CBspheres_s1.png" width="300px"/>
 						<figcaption>1 sample/px</figcaption>
 					</td>
 					<td style="text-align: center;">
-						<img src="bunny_s2.png" width="300px"/>
+						<img src="CBspheres_s2.png" width="300px"/>
 						<figcaption>2 samples/px</figcaption>
 					</td>
 					<td style="text-align: center;">
-						<img src="bunny_s4.png" width="300px"/>
+						<img src="CBspheres_s4.png" width="300px"/>
 						<figcaption>4 samples/px</figcaption>
 					</td>
 				</tr>
 				<tr>
 					<td style="text-align: center;">
-						<img src="bunny_s8.png" width="300px"/>
+						<img src="CBspheres_s8.png" width="300px"/>
 						<figcaption>8 samples/px</figcaption>
 					</td>
 					<td style="text-align: center;">
-						<img src="bunny_s16.png" width="300px"/>
+						<img src="CBspheres_s16.png" width="300px"/>
 						<figcaption>16 samples/px</figcaption>
 					</td>
 					<td style="text-align: center;">
-						<img src="bunny_s64.png" width="300px"/>
+						<img src="CBspheres_s64.png" width="300px"/>
 						<figcaption>64 samples/px</figcaption>
 					</td>
 				</tr>
 				<tr>
 					<td style="text-align: center;">
-						<img src="bunny_s1024.png" width="300px"/>
+						<img src="CBspheres_s1024.png" width="300px"/>
 						<figcaption>1024 samples/px</figcaption>
 					</td>
 				</tr>
