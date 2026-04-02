@@ -75,7 +75,10 @@
 		-->
 
 		<h2>Overview</h2>
-		Give a high-level overview of what you implemented in this homework. Think about what you've built as a whole. Share your thoughts on what interesting things you've learned from completing the homework.
+		<p>In this homework, we built a physically-based path tracer from scratch. Starting from ray generation and primitive intersection (triangles and spheres), we accelerated scene traversal using a BVH with SAH-based construction. We then implemented direct illumination via both uniform hemisphere sampling and light importance sampling, followed by full global illumination through recursive path tracing with Russian Roulette termination. Finally, we added adaptive sampling to concentrate computation on difficult pixels rather than sampling uniformly everywhere.
+		The most interesting insight was seeing how much indirect lighting contributes to realism in ways that rasterization cannot replicate without expensive hacks. Russian Roulette was also a satisfying result: a statistically unbiased trick that makes rendering with m=100 practically identical in both speed and quality to m=5.
+		</p>
+
 
 		<h2>Part 1: Ray Generation and Scene Intersection</h2>
 
