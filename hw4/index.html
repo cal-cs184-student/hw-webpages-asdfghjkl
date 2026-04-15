@@ -100,7 +100,79 @@
 		</figure>
 
 		<h2>Part 2: Simulation via numerical integration</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		<p><strong>Here is <code>scene/pinned2.json</code> with varying parameters: </strong></p>
+		<figure>
+			<img src="p2 default.png" alt="Cloth draped over sphere" style="width:70%"/>
+			<figcaption>default parameters</figcaption>
+		</figure>
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="p2 low ks.png" width="400px"/>
+				  <figcaption>low ks</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="p2 high ks.png" width="400px"/>
+				  <figcaption>high ks</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
+
+		<p>The spring constant ks defines the "stiffness" of the fabric. 
+			Low ks (e.g., 1 N/m on the right): The cloth appears very stretchy and loose, and is able to deform a lot. As it falls, there is significant sagging between the pinned points, hence the large arc. The folds are small and numerous because the material lacks the internal tension to resist gravity effectively.
+			High ks (e.g., 10,000 N/m on the left): The cloth behaves more like heavy denim, and doesn't deform much. It resists stretching strongly. In the final resting state, the top edge between pinned corners remains much flatter, and the folds are larger and more "structured."
+		</p>
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="p2 low density.png" width="400px"/>
+				  <figcaption>low density</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="p2 high density.png" width="400px"/>
+				  <figcaption>high density</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
+
+		<p>Density determines the mass of each point mass (m = total_mass/num_masses).
+			Low Density (1 g/cm^2 on the right): The cloth is light as it has a very low total mass. Because the gravitational force (F = ma) is smaller, the internal spring forces easily counteract gravity. 
+			The cloth reaches a resting state quickly with minimal sagging, as there is less force pulling down between the pinned points.
+			High Density (1000 g/cm^2 on the left): The cloth is heavy. The increased mass exerts more downward force on the springs. 
+			Even with a standard ks, a high-density cloth will sag significantly, as the weight of the "fabric" overcomes the spring tension. 
+		</p>
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="p2 low damping.png" width="400px"/>
+				  <figcaption>low damping</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="p2 high damping.png" width="400px"/>
+				  <figcaption>high damping</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
+
+		<p>Damping simulates energy loss (friction, air resistance, internal heat).
+			Low Damping (e.g., 0% on the right): The cloth is extremely "bouncy." When dropped, it will oscillate back and forth for a very long time before coming to rest. It may even appear jittery or chaotic as energy is not being dissipated from the system.
+			High Damping (e.g., 100% on the left): The motion appears "thick," as if the cloth is moving through honey. When dropped, it falls very slowly and settles into its resting position almost immediately without any swinging or bouncing.
+		</p>
+
+		<p><strong>Here is <code>scene/pinned4.json</code> in its final resting state with default parameters: </strong></p>
+		<figure>
+			<img src="p2 pinned 4.png" alt="Cloth draped over sphere" style="width:70%"/>
+			<figcaption>pinned4.json with default parameters</figcaption>
+		</figure>
 
 		<h2>Part 3: Handling collisions with other objects</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
