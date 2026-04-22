@@ -175,7 +175,51 @@
 		</figure>
 
 		<h2>Part 3: Handling collisions with other objects</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+
+		<h3>How did we implement the handling of collisions with spheres and planes: </h3>
+		<p><strong>Sphere Collisions</strong></p>
+		<p>If a point mass is inside the sphere (distance to origin &lt; radius), it gets bumped to the surface by projecting the direction vector from the origin to the point mass onto the sphere surface (normalize &times; radius). The new position is <code>last_position + (1 - friction) &times; (tangent_point - last_position)</code>.</p>
+
+		<p><strong>Plane Collisions</strong></p>
+		<p>If a point mass crosses the plane (signed distances on opposite sides), the tangent point is found by linearly interpolating between last and current positions at the crossing. A small <code>SURFACE_OFFSET</code> keeps it just above the surface. The new position is <code>last_position + (1 - friction) &times; (tangent_point + offset - last_position)</code>.</p>
+
+		<p><strong>Integration in simulate</strong></p>
+		<p>After Verlet integration and Provot constraint correction, every point mass is tested against every collision object via <code>co-&gt;collide(pm)</code>, which adjusts its position in place if needed.</p>
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td style="text-align: center;">
+						<img src="p3-default.png" width="300px"/>
+						<figcaption>cloth on sphere ks=5000</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="p3-500.png" width="300px"/>
+						<figcaption>cloth on sphere ks=500</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="p3-50000.png" width="300px"/>
+						<figcaption>cloth on sphere ks=50000</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+
+		<figure>
+			<img src="p3plane.png" alt="Cloth draped over sphere" style="width:70%"/>
+			<figcaption>cloth lying peacefully on plane :D </figcaption>
+		</figure>
+
+		<p><strong>Difference between results of the 3 ks values:</strong></p>
+		<p>Higher <code>ks</code> means stiffer springs, so the cloth behaves differently across the three values:</p>
+		<ul>
+			<li><strong>ks = 500</strong>: The cloth is very soft and drapes closely over the sphere, with many folds and the edges hanging low.</li>
+			<li><strong>ks = 5000</strong>: A moderate drape — the cloth conforms to the sphere while retaining some stiffness, with fewer folds.</li>
+			<li><strong>ks = 50000</strong>: The cloth is very stiff and barely conforms to the sphere, sitting almost like a rigid sheet on top with minimal folding and edges barely drooping.</li>
+		</ul>
+
+
+
 
 		<h2>Part 4: Handling self-collisions</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
