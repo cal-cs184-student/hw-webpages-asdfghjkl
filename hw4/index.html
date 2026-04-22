@@ -205,11 +205,6 @@
 			</table>
 		</div>
 
-		<figure>
-			<img src="p3plane.png" alt="Cloth draped over sphere" style="width:70%"/>
-			<figcaption>cloth lying peacefully on plane :D </figcaption>
-		</figure>
-
 		<p><strong>Difference between results of the 3 ks values:</strong></p>
 		<p>Higher <code>ks</code> means stiffer springs, so the cloth behaves differently across the three values:</p>
 		<ul>
@@ -218,11 +213,152 @@
 			<li><strong>ks = 50000</strong>: The cloth is very stiff and barely conforms to the sphere, sitting almost like a rigid sheet on top with minimal folding and edges barely drooping.</li>
 		</ul>
 
-
-
+		<figure>
+			<img src="p3plane.png" alt="Cloth draped over sphere" style="width:70%"/>
+			<figcaption>cloth lying peacefully on plane :D </figcaption>
+		</figure>
 
 		<h2>Part 4: Handling self-collisions</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+		<p><strong>How did we implement handling self-collisions: </strong></p>
+		<p>
+			Self-collisions are handled using spatial hashing for efficiency. At each time step, 
+			<code>build_spatial_map</code> partitions 3D space into boxes of dimensions w &times; h &times; t 
+			and maps each point mass to its corresponding box via <code>hash_position</code>. The hash is 
+			computed by truncating each coordinate to its box index and combining them using large primes 
+			via XOR to produce a unique float key.
+		</p>
+		<p>
+			In <code>self_collide</code>, each point mass looks up its spatial hash bucket and checks all 
+			candidate point masses in the same volume. If two point masses (excluding itself) are within 
+			<code>2 * thickness</code> distance, a correction vector is computed to push them apart to exactly 
+			that distance. The final correction applied to the point mass is the average of all pairwise 
+			corrections, scaled down by <code>simulation_steps</code> for stability.
+		</p>
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="p4default (4).png" width="400px"/>
+				  <figcaption>self collisions - start</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="p4default (3).png" width="400px"/>
+				  <figcaption>self collisions - middle (1)</figcaption>
+				</td>
+			  </tr>
+			  <tr>
+				<td style="text-align: center;">
+				  <img src="p4default (2).png" width="400px"/>
+				  <figcaption>self collisions - middle (2)</figcaption>
+				</td>
+				<td style="text-align: center;">
+				  <img src="p4default (1).png" width="400px"/>
+				  <figcaption>self collisions - end (rest)</figcaption>
+				</td>
+			  </tr>
+			</table>
+		</div>
+
+		
+
+		<p><strong>Effect of Density</strong></p>
+		<p><strong>Low Density (1g/cm^2): </strong></p>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td style="text-align: center;">
+						<img src="p4lowdens (1).png" width="300px"/>
+						<figcaption>start</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="p4lowdens (3).png" width="300px"/>
+						<figcaption>middle</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="p4lowdens (2).png" width="300px"/>
+						<figcaption>rest</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+
+		<p><strong>High Density (100g/cm^2): </strong></p>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td style="text-align: center;">
+						<img src="p4highdens (3).png" width="300px"/>
+						<figcaption>start</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="p4highdens (2).png" width="300px"/>
+						<figcaption>middle</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="p4highdens (1).png" width="300px"/>
+						<figcaption>rest</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+
+		<p>
+			At low density, the cloth is lighter and falls more slowly, with larger, smoother folds. 
+			At high density, the cloth is heavier and falls faster, collapsing into tighter, more chaotic folds 
+			as the weight overwhelms the spring forces.
+		</p>
+
+		<p><strong>Effect of ks</strong></p>
+		<p><strong>Low ks (500 N/m): </strong></p>
+
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td style="text-align: center;">
+						<img src="p4lowks (1).png" width="300px"/>
+						<figcaption>start</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="p4lowks (3).png" width="300px"/>
+						<figcaption>middle</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="p4lowks (2).png" width="300px"/>
+						<figcaption>rest</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+
+		<p><strong>High ks (50000 N/m): </strong></p>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td style="text-align: center;">
+						<img src="p4highks (1).png" width="300px"/>
+						<figcaption>start</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="p4highks (3).png" width="300px"/>
+						<figcaption>middle</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="p4highks (2).png" width="300px"/>
+						<figcaption>rest</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+
+		<p>
+			At low ks, the cloth is very soft and folds tightly over itself with many small wrinkles. 
+			At high ks, the springs are stiffer and resist folding, resulting in broader, smoother folds 
+			and the cloth taking longer to settle.
+		</p>
+
+
+
 
 		<h2>Part 5: Shaders</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
