@@ -190,12 +190,12 @@
 			<table style="width: 100%; text-align: center; border-collapse: collapse;">
 				<tr>
 					<td style="text-align: center;">
-						<img src="p3-default.png" width="300px"/>
-						<figcaption>cloth on sphere ks=5000</figcaption>
-					</td>
-					<td style="text-align: center;">
 						<img src="p3-500.png" width="300px"/>
 						<figcaption>cloth on sphere ks=500</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="p3-default.png" width="300px"/>
+						<figcaption>cloth on sphere ks=5000</figcaption>
 					</td>
 					<td style="text-align: center;">
 						<img src="p3-50000.png" width="300px"/>
@@ -361,9 +361,153 @@
 
 
 		<h2>Part 5: Shaders</h2>
-		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
-		<h2>(Optional) Part 6: Extra Credit - Additional cloth simulation features!</h2>
+		<p><strong>What is a Shader Program: </strong></p>
+		<p>A shader program runs on the GPU in parallel for every vertex and fragment. 
+			The vertex shader transforms geometry (positions, normals) from model space to screen space and passes interpolated values to the fragment shader via varyings. 
+			The fragment shader then uses those interpolated values to compute the final pixel color, implementing lighting and material effects.
+		</p>
+
+		<p><strong>Blinn-Phong Shading Model: </strong></p>
+		<p>Blinn-Phong combines three lighting components: ambient (constant base light regardless of geometry), 
+			diffuse (light scattered equally in all directions, dependent on the angle between the surface normal and light direction), 
+			and specular (mirror-like highlights dependent on the halfway vector between the light and view directions). 
+			Together they approximate how real surfaces interact with light.
+		</p>
+
+		<p><strong>Ambient only:</strong></p>
+		<figure>
+			<img src="p5ambient.png" alt="Cloth draped over sphere" style="width:70%"/>
+			<figcaption>Ambient only</figcaption>
+		</figure>
+
+		<p><strong>Diffuse only:</strong></p>
+		<figure>
+			<img src="p5diffuse.png" alt="Cloth draped over sphere" style="width:70%"/>
+			<figcaption>Diffuse only</figcaption>
+		</figure>
+
+		<p><strong>Specular only:</strong></p>
+		<figure>
+			<img src="p5specular.png" alt="Cloth draped over sphere" style="width:70%"/>
+			<figcaption>Specular only</figcaption>
+		</figure>
+
+		<p><strong>Full Blinn-Phong:</strong></p>
+		<figure>
+			<img src="p5phong.png" alt="Cloth draped over sphere" style="width:70%"/>
+			<figcaption>Full Blinn-Phong</figcaption>
+		</figure>
+
+		<p><strong>Texture Mapping: </strong></p>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td style="text-align: center;">
+						<img src="p5texture.png" width="400px"/>
+						<figcaption>Custom texture mapping</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="p5texture (2).png" width="400px"/>
+						<figcaption>Custom texture mapping</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+
+		<p><strong>Bump and Displacement Mapping: </strong></p>
+
+		<p><strong>Bump Mapping: </strong></p>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td style="text-align: center;">
+						<img src="p5bumpcloth.png" width="400px"/>
+						<figcaption>Bump mapping on sphere</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="p5bumpsphere.png" width="400px"/>
+						<figcaption>Bump mapping on cloth</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+
+		<p><strong>Displacement Mapping: </strong></p>
+		<figure>
+			<img src="p5displace.png" alt="Cloth draped over sphere" style="width:70%"/>
+			<figcaption>Displacement mapping on sphere</figcaption>
+		</figure>
+
+		<p><strong>Bump Mapping: </strong></p>
+		<p>Bump mapping is a shading technique used to create the illusion of depth and texture on a surface without actually modifying the underlying geometry. 
+			It works by altering the surface normals (the vectors perpendicular to the surface that dictate how light bounces off it) on a per-fragment (pixel) basis using a height map (texture).
+		</p>
+		<p><strong>The Result:</strong> When light hits the surface, the modified normals trick the lighting equation into creating shadows and highlights as if the surface were bumpy. However, if you look at the silhouette (the edge) of the object, it will still be perfectly smooth because the actual 3D mesh hasn't changed.</p>
+
+		<p><strong>Displacement Mapping: </strong></p>
+		<p>Displacement mapping, on the other hand, physically alters the geometry of the object. It uses the exact same height map texture, but instead of just faking the normals, it physically moves (displaces) the actual vertices of the mesh along their normal vectors based on the texture's values. It also updates the normals to match the new geometry.</p>
+		<p><strong>The Result:</strong> The surface actually becomes bumpy. The silhouette of the object will appear jagged and uneven, and the displaced geometry can even cast real shadows on itself.</p>
+
+		<p><strong>Varying coarseness: </strong></p>
+		<p><strong><code>-o 16 -a 16:</code> </strong></p>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td style="text-align: center;">
+						<img src="p5bump16.png" width="400px"/>
+						<figcaption>Bump mapping on sphere</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="p5disp16.png" width="400px"/>
+						<figcaption>Displacement mapping on cloth</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+
+		<p><strong><code>-o 128 -a 128:</code> </strong></p>
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td style="text-align: center;">
+						<img src="p5bump128.png" width="400px"/>
+						<figcaption>Bump mapping on sphere</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="p5disp128.png" width="400px"/>
+						<figcaption>Displacement mapping on cloth</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+
+		<p>
+			It is clear from the displacement shading screenshots how the sphere's mesh resolution (coarseness) impacts the render. Because displacement mapping physically alters the height of the vertices, a higher resolution mesh (128 for longitude and latitude) allows the displaced surface details to become much more pronounced and accurate.
+
+			On the other hand, it is difficult to tell any difference between the two resolution settings when using bump shading. This is because bump shading only manipulates the surface normals based on the texture—mapping the illusion of depth onto the sphere—without actually changing the sphere's physical surface geometry at all. Thus, the underlying mesh coarseness does not affect bump shading nearly as much as it affects displacement shading.
+		</p>
+
+	
+		<p><strong>Mirror Shader: </strong></p>
+		
+		<div style="display: flex; flex-direction: column; align-items: center;">
+			<table style="width: 100%; text-align: center; border-collapse: collapse;">
+				<tr>
+					<td style="text-align: center;">
+						<img src="p5mirrorcloth.png" width="400px"/>
+						<figcaption>Mirror shader on cloth</figcaption>
+					</td>
+					<td style="text-align: center;">
+						<img src="p5mirrorsphere.png" width="400px"/>
+						<figcaption>Mirror shader on sphere</figcaption>
+					</td>
+				</tr>
+			</table>
+		</div>
+
+
+		<!-- <h2>(Optional) Part 6: Extra Credit - Additional cloth simulation features!</h2>
 		Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 		
 		<h2>Additional Notes (please remove)</h2>
@@ -378,4 +522,4 @@
 		</ul>
 		</div>
 	</body>
-</html>
+</html> -->
